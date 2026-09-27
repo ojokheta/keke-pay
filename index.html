@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>KekePays</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.47.0/iconfont/tabler-icons.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root {
+            --bg: #000000;
+            --surface: #121212;
+            --surface-2: #1c1c1e;
+            --raised: #232325;
+            --hair: rgba(255, 255, 255, 0.10);
+            --hair-2: rgba(255, 255, 255, 0.16);
+            --text: #ffffff;
+            --text-2: rgba(255, 255, 255, 0.62);
+            --text-3: rgba(255, 255, 255, 0.36);
+            --green-a: #0c4a34;
+            --green-b: #1fbf75;
+            --accent: #2ee881;
+            --accent-ink: #04150c;
+            --gold-a: #5c3d00;
+            --gold-b: #e6a917;
+            --gold-ink: #1c1200;
+            --danger: #ff453a;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+            background: radial-gradient(120% 100% at 50% 0%, #0e0e10 0%, #000 60%);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100%;
+            padding: 20px 10px;
+        }
+
+        button {
+            font-family: inherit;
+            color: inherit;
+        }
+
+        .num {
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "tnum";
+        }
+
+        .phone {
+            width: 100%;
+            max-width: 390px;
+            height: 800px;
+            max-height: 94vh;
+            background: var(--bg);
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 40px 90px rgba(0, 0, 0, 0.65), inset 0 0 0 6px #050505;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .notch {
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 110px;
+            height: 22px;
+            background: #050505;
+            border-radius: 14px;
+            z-index: 40;
+        }
+
+        .statusbar {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px 24px 2px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-2);
+        }
+
+        .stage {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .stage::-webkit-scrollbar {
+            display: none;
+        }
+
+        .stage-center {
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 28px;
+        }
+
+        .stage-form {
+            padding: 8px 22px 26px;
+        }
+
+        .mark-ring {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--surface-2);
+            border: 1px solid var(--hair-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .mark-ring i {
+            font-size: 34px;
+            color: var(--text-2);
+        }
+
+        .mark-ring .sweep {
+            position: absolute;
+            inset: -2px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            border-top-color: var(--accent);
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        .mark-ring.scanning .sweep {
+            display: block;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .stage h1 {
+            font-size: 23px;
+            font-weight: 700;
+            margin: 0 0 6px;
+            letter-spacing: -0.3px;
+        }
+
+        .stage p.sub {
+            color: var(--text-2);
+            font-size: 14px;
+            margin: 0 0 28px;
+            line-height: 1.5;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 14px;
+            padding: 15px 0;
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        .btn-solid {
+            background: var(--accent);
+            color: var(--accent-ink);
+        }
+
+        .btn-ghost {
+            background: var(--surface-2);
+            border: 1px solid var(--hair);
+            color: var(--text);
+        }
+
+        .btn-gold {
+            background: var(--gold-b);
+            color: var(--gold-ink);
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-row .btn {
+            flex: 1;
+        }
+
+        .backrow {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 0 8px;
+        }
+
+        .backrow i {
+            font-size: 20px;
+        }
+
+        .backrow span {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .field-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 14px 0 6px;
+        }
+
+        .field {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--hair);
+            border-radius: 14px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 14.5px;
+            font-weight: 600;
+            padding: 13px 14px;
+            appearance: none;
+        }
+
+        .field::placeholder {
+            color: var(--text-3);
+            font-weight: 500;
+        }
+
+        .err {
+            color: var(--danger);
+            font-size: 12.5px;
+            margin-top: 6px;
+            display: none;
+        }
+
+        .err.show {
+            display: block;
+        }
+
+        #shell {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .headrow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px 8px;
+        }
+
+        .headrow .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .headrow .brand span {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .role-badge {
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: var(--text-2);
+            background: var(--surface-2);
+            border: 1px solid var(--hair);
+            padding: 3px 9px;
+            border-radius: 999px;
+        }
+
+        .screen {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 20px 26px;
+            display: none;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .screen.on {
+            display: block;
+        }
+
+        .screen::-webkit-scrollbar {
+            display: none;
+        }
+
+        .wallet-card {
+            border-radius: 22px;
+            padding: 22px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--green-a), var(--green-b) 130%);
+            box-shadow: 0 18px 40px rgba(18, 191, 117, 0.18);
+        }
+
+        .wallet-card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(140% 100% at 100% 0%, rgba(255, 255, 255, 0.16), transparent 55%);
+        }
+
+        .wallet-card .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            position: relative;
+        }
+
+        .wallet-card .brand {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+        }
+
+        .wallet-card .chip {
+            width: 34px;
+            height: 24px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        .wallet-card .label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.75);
+            margin: 20px 0 4px;
+            position: relative;
+        }
+
+        .wallet-card .amount {
+            font-size: 34px;
+            font-weight: 700;
+            position: relative;
+        }
+
+        .wallet-card .foot {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 22px;
+            position: relative;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .earnings-card {
+            background: linear-gradient(135deg, var(--gold-a), var(--gold-b) 130%);
+            box-shadow: 0 18px 40px rgba(230, 169, 23, 0.16);
+        }
+
+        .earnings-card .brand,
+        .earnings-card .amount,
+        .earnings-card .label {
+            color: var(--gold-ink);
+        }
+
+        .earnings-card .foot {
+            color: rgba(28, 18, 0, 0.7);
+        }
+
+        .earnings-card .chip {
+            background: rgba(28, 18, 0, 0.25);
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 22px;
+        }
+
+        .actions .btn {
+            flex: 1;
+            padding: 13px 0;
+            font-size: 14px;
+        }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-3);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin: 4px 0 10px;
+        }
+
+        .fare-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 9px;
+            margin-bottom: 18px;
+        }
+
+        .fare-btn {
+            background: var(--surface);
+            border: 1px solid var(--hair);
+            border-radius: 14px;
+            padding: 16px 0;
+            text-align: center;
+        }
+
+        .fare-btn .num {
+            font-size: 18px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .fare-btn small {
+            color: var(--text-3);
+            font-size: 11px;
+        }
+
+        .fare-btn:active {
+            transform: scale(0.96);
+            border-color: var(--hair-2);
+        }
+
+        .fare-btn.sel {
+            border-color: var(--accent);
+        }
+
+        .method {
+            flex: 1;
+            background: var(--surface);
+            border: 1px solid var(--hair);
+            border-radius: 14px;
+            padding: 14px 0;
+            text-align: center;
+        }
+
+        .method i {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 6px;
+            color: var(--text-2);
+        }
+
+        .method span {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .method:active {
+            transform: scale(0.96);
+        }
+
+        .method.active {
+            border-color: var(--accent);
+        }
+
+        .method-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .trip {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 13px 0;
+            border-bottom: 1px solid var(--hair);
+        }
+
+        .trip:last-child {
+            border-bottom: none;
+        }
+
+        .trip-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .trip-ic {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--surface-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .trip-ic i {
+            font-size: 17px;
+            color: var(--text-2);
+        }
+
+        .trip .who {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .trip .when {
+            font-size: 11.5px;
+            color: var(--text-3);
+        }
+
+        .trip .amt {
+            font-size: 14.5px;
+            font-weight: 700;
+        }
+
+        .trip .amt.pos {
+            color: var(--accent);
+        }
+
+        .decal-wrap {
+            text-align: center;
+            padding: 6px 0 4px;
+        }
+
+        .id-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--surface-2);
+            border: 1px solid var(--hair);
+            border-radius: 999px;
+            padding: 7px 16px;
+            font-size: 12px;
+            color: var(--text-2);
+            margin-bottom: 20px;
+        }
+
+        .decal {
+            width: 190px;
+            height: 190px;
+            margin: 0 auto 20px;
+            background: #fff;
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px;
+        }
+
+        #qr-target {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .waiting {
+            color: var(--text-2);
+            font-size: 14px;
+            margin-bottom: 22px;
+        }
+
+        .sim-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .sim-row .btn {
+            flex: 1;
+            padding: 13px 0;
+            font-size: 13.5px;
+        }
+
+        .profile-card {
+            background: var(--surface);
+            border: 1px solid var(--hair);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-card .av {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--surface-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            color: var(--text-2);
+        }
+
+        .profile-card .name {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .profile-card .sub {
+            font-size: 12px;
+            color: var(--text-3);
+        }
+
+        .bank-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            border: 1px solid var(--hair);
+            border-radius: 14px;
+            margin-bottom: 10px;
+        }
+
+        .bank-row.sel {
+            border-color: var(--accent);
+        }
+
+        .bank-row.dashed {
+            border-style: dashed;
+            color: var(--text-2);
+            justify-content: center;
+        }
+
+        .bank-row .bic {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--surface-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: none;
+        }
+
+        .bank-row .info {
+            flex: 1;
+        }
+
+        .bank-row .name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .bank-row .sub {
+            font-size: 12px;
+            color: var(--text-3);
+        }
+
+        .bank-row .check {
+            width: 19px;
+            height: 19px;
+            border-radius: 50%;
+            border: 1.5px solid var(--hair-2);
+            flex: none;
+        }
+
+        .bank-row.sel .check {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .payout-note {
+            font-size: 11.5px;
+            color: var(--text-3);
+            text-align: center;
+            margin: 14px 0;
+            line-height: 1.5;
+        }
+
+        .action-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 4px;
+            border-bottom: 1px solid var(--hair);
+            font-size: 14.5px;
+            font-weight: 600;
+        }
+
+        .action-item:last-child {
+            border-bottom: none;
+        }
+
+        .action-item i {
+            font-size: 19px;
+            color: var(--text-2);
+        }
+
+        .action-item.danger {
+            color: var(--danger);
+        }
+
+        .action-item.danger i {
+            color: var(--danger);
+        }
+
+        .tabbar {
+            display: flex;
+            padding: 10px 8px calc(10px + env(safe-area-inset-bottom, 0px));
+            border-top: 1px solid var(--hair);
+            background: rgba(18, 18, 18, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .tabbar button {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-3);
+            font-size: 10.5px;
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .tabbar button.on {
+            color: var(--accent);
+        }
+
+        .tabbar button.on i {
+            color: var(--accent);
+        }
+
+        .tabbar i {
+            font-size: 21px;
+            color: var(--text-3);
+        }
+
+        .sheet-bg {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: flex-end;
+            z-index: 20;
+        }
+
+        .sheet-bg.on {
+            display: flex;
+        }
+
+        .sheet {
+            width: 100%;
+            background: var(--surface-2);
+            border-radius: 24px 24px 0 0;
+            padding: 10px 20px calc(26px + env(safe-area-inset-bottom, 0px));
+            border-top: 1px solid var(--hair-2);
+            transform: translateY(100%);
+            transition: transform .38s cubic-bezier(.2, .9, .25, 1.05);
+        }
+
+        .sheet-bg.on .sheet {
+            transform: translateY(0);
+        }
+
+        .grabber {
+            width: 36px;
+            height: 5px;
+            background: var(--hair-2);
+            border-radius: 3px;
+            margin: 0 auto 16px;
+        }
+
+        .sheet h3 {
+            margin: 0 0 4px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .sheet p.sub {
+            margin: 0 0 18px;
+            color: var(--text-2);
+            font-size: 13px;
+        }
+
+        .code-input {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--hair);
+            border-radius: 14px;
+            color: var(--text);
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 8px;
+            text-align: center;
+            padding: 15px 0;
+            margin: 14px 0 16px;
+        }
+
+        .amount-input {
+            letter-spacing: 0;
+            font-size: 28px;
+            margin: 4px 0 16px;
+        }
+
+        .qr-box {
+            width: 100%;
+            height: 170px;
+            margin: 0 0 16px;
+            background: var(--surface);
+            border: 1px dashed var(--hair-2);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: var(--text-3);
+            font-size: 12.5px;
+        }
+
+        .qr-box i {
+            font-size: 30px;
+        }
+
+        .modal-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-row .btn {
+            flex: 1;
+        }
+
+        .flash {
+            position: absolute;
+            inset: 0;
+            background: var(--accent);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 30px;
+            z-index: 15;
+            color: var(--accent-ink);
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.94);
+            transition: opacity .3s cubic-bezier(.2, .9, .25, 1.05), transform .3s cubic-bezier(.2, .9, .25, 1.05);
+        }
+
+        .flash.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1);
+        }
+
+        .flash .ic {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(4, 21, 12, 0.14);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin-bottom: 18px;
+            flex: none;
+            transform: scale(0.4);
+            transition: transform .45s cubic-bezier(.34, 1.56, .64, 1) .1s;
+        }
+
+        .flash.show .ic {
+            transform: scale(1);
+        }
+
+        .flash .amt {
+            font-size: 46px;
+            font-weight: 700;
+        }
+
+        .flash .msg {
+            font-size: 15px;
+            font-weight: 600;
+            margin-top: 6px;
+            opacity: 0.75;
+        }
+
+        .flash button {
+            flex: none;
+            width: auto;
+            margin-top: 36px;
+            padding: 14px 34px;
+            background: rgba(4, 21, 12, 0.16);
+            color: var(--accent-ink);
+            border: none;
+        }
+
+        .flash.gold {
+            background: var(--gold-b);
+            color: var(--gold-ink);
+        }
+
+        .flash.gold .ic {
+            background: rgba(28, 18, 0, 0.14);
+        }
+
+        .flash.gold button {
+            background: rgba(28, 18, 0, 0.16);
+            color: var(--gold-ink);
+        }
+
+        .toast {
+            position: absolute;
+            left: 20px;
+            right: 20px;
+            bottom: 18px;
+            background: var(--surface-2);
+            border: 1px solid var(--hair-2);
+            color: var(--text);
+            border-radius: 14px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13.5px;
+            font-weight: 600;
+            transform: translateY(140%);
+            transition: transform .3s cubic-bezier(.2, .9, .25, 1.05);
+            z-index: 25;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+        }
+
+        .toast i {
+            color: var(--accent);
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="phone">
+        <div class="notch"></div>
+        <div class="statusbar"><span>9:41</span><span><i class="ti ti-wifi" style="font-size:13px;"></i>&nbsp;<i
+                    class="ti ti-battery-4" style="font-size:15px;"></i></span></div>
+
+        <!-- ONBOARDING -->
+        <div class="stage stage-center" id="onboarding">
+            <div class="mark-ring" style="background:var(--surface); width:72px;height:72px;"><i
+                    class="ti ti-scooter"></i></div>
+            <h1>Welcome to KekePays</h1>
+            <p class="sub">Campus transit, digitised. Choose how you'll use it.</p>
+            <button class="btn btn-solid btn-full" id="pick-passenger" style="margin-bottom:10px;"><i
+                    class="ti ti-user"></i>Continue as a passenger</button>
+            <button class="btn btn-ghost btn-full" id="pick-driver"><i class="ti ti-steering-wheel"></i>Continue as a
+                driver</button>
+        </div>
+
+        <!-- REGISTER: PASSENGER -->
+        <div class="stage stage-form" id="register-rider">
+            <div class="backrow" data-back="onboarding"><i class="ti ti-chevron-left"></i><span>Passenger details</span>
+            </div>
+            <p class="sub" style="text-align:left;margin-bottom:6px;">This funds your student wallet and links trips to
+                you.</p>
+            <div class="field-label">Full name</div>
+            <input class="field" id="r-name" placeholder="Adaeze Okonkwo">
+            <div class="field-label">Matric number</div>
+            <input class="field" id="r-matric" placeholder="e.g. 199057" inputmode="numeric">
+            <div class="field-label">Phone number</div>
+            <input class="field" id="r-phone" placeholder="080X XXX XXXX" inputmode="tel">
+            <div class="field-label">Create a 4-digit PIN</div>
+            <input class="field code-input amount-input" id="r-pin" maxlength="4" inputmode="numeric" placeholder="••••"
+                style="letter-spacing:10px;font-size:22px;">
+            <p class="err" id="r-err">Fill in every field to continue.</p>
+            <button class="btn btn-solid btn-full" id="r-submit" style="margin-top:16px;">Create passenger
+                account</button>
+        </div>
+
+        <!-- REGISTER: DRIVER -->
+        <div class="stage stage-form" id="register-driver">
+            <div class="backrow" data-back="onboarding"><i class="ti ti-chevron-left"></i><span>Driver details</span>
+            </div>
+            <p class="sub" style="text-align:left;margin-bottom:6px;">Used to generate your decal and route payouts.</p>
+            <div class="field-label">Full name</div>
+            <input class="field" id="d-name" placeholder="Musa Ibrahim">
+            <div class="field-label">Phone number</div>
+            <input class="field" id="d-phone" placeholder="080X XXX XXXX" inputmode="tel">
+            <div class="field-label">Vehicle type</div>
+            <select class="field" id="d-vehicle">
+                <option>Keke Napep</option>
+                <option>Shared cab</option>
+            </select>
+            <div class="field-label">Plate number</div>
+            <input class="field" id="d-plate" placeholder="e.g. XA 227 UI" style="text-transform:uppercase;">
+            <div class="field-label">Payout bank</div>
+            <select class="field" id="d-bank">
+                <option>OPay</option>
+                <option>Kuda</option>
+                <option>Moniepoint</option>
+                <option>Zenith</option>
+                <option>FirstBank</option>
+            </select>
+            <div class="field-label">Account number</div>
+            <input class="field" id="d-acct" placeholder="10-digit NUBAN" inputmode="numeric" maxlength="10">
+            <div class="field-label">Create a 4-digit PIN</div>
+            <input class="field code-input amount-input" id="d-pin" maxlength="4" inputmode="numeric" placeholder="••••"
+                style="letter-spacing:10px;font-size:22px;">
+            <p class="err" id="d-err">Fill in every field to continue.</p>
+            <button class="btn btn-gold btn-full" id="d-submit" style="margin-top:16px;">Create driver account</button>
+        </div>
+
+        <!-- LOCK -->
+        <div class="stage stage-center" id="lock">
+            <div class="mark-ring" id="face-ring"><i class="ti ti-scan-eye"></i>
+                <div class="sweep"></div>
+            </div>
+            <h1 id="lock-title">KekePays</h1>
+            <p class="sub" id="lock-sub">Face ID to open your wallet</p>
+            <button class="btn btn-ghost" id="unlock-btn" style="padding:16px 28px;"><i
+                    class="ti ti-lock-open"></i>Unlock</button>
+        </div>
+
+        <div id="shell">
+            <div class="headrow">
+                <div class="brand"><i class="ti ti-scooter" style="font-size:20px;"></i><span>KekePays</span><span
+                        class="role-badge" id="role-badge">Passenger</span></div>
+            </div>
+
+            <div class="screen on" id="screen-rider-home">
+                <div class="wallet-card">
+                    <div class="top"><span class="brand">KEKEPAYS · UI CAMPUS</span><span class="chip"></span></div>
+                    <div class="label">Wallet balance</div>
+                    <div class="amount num">&#8358;<span id="balance">1,450</span></div>
+                    <div class="foot"><span id="rider-name-tag">•••• 4213</span><span>Student wallet</span></div>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-solid" id="open-topup"><i class="ti ti-plus"></i>Top up</button>
+                    <button class="btn btn-ghost" id="goto-history"><i class="ti ti-receipt-2"></i>History</button>
+                </div>
+                <div class="section-title">Pay a fare</div>
+                <div class="fare-grid">
+                    <div class="fare-btn" data-amt="100"><span class="num">&#8358;100</span><small>Short hop</small>
+                    </div>
+                    <div class="fare-btn" data-amt="200"><span class="num">&#8358;200</span><small>Standard</small>
+                    </div>
+                    <div class="fare-btn" data-amt="300"><span class="num">&#8358;300</span><small>Hall run</small>
+                    </div>
+                    <div class="fare-btn" data-amt="500"><span class="num">&#8358;500</span><small>Cab share</small>
+                    </div>
+                    <div class="fare-btn" data-amt="600"><span class="num">&#8358;600</span><small>Full cab</small>
+                    </div>
+                    <div class="fare-btn" id="fare-other"><span class="num"
+                            style="font-size:14px;color:var(--text-2);">Other</span></div>
+                </div>
+            </div>
+
+            <div class="screen" id="screen-rider-history">
+                <div class="section-title">Transactions</div>
+                <div id="history"></div>
+            </div>
+
+            <div class="screen" id="screen-rider-settings">
+                <div class="profile-card">
+                    <div class="av"><i class="ti ti-user"></i></div>
+                    <div>
+                        <div class="name" id="p-name-r">Adaeze Okonkwo</div>
+                        <div class="sub" id="p-sub-r">Matric •••• · UI Campus</div>
+                    </div>
+                </div>
+                <div class="section-title">Account</div>
+                <div class="action-item" id="switch-to-driver"><i class="ti ti-steering-wheel"></i>Switch to driver mode
+                    (demo)</div>
+                <div class="action-item danger" id="logout-r"><i class="ti ti-logout"></i>Log out &amp; reset</div>
+            </div>
+
+            <div class="screen" id="screen-driver-home">
+                <div class="wallet-card earnings-card">
+                    <div class="top"><span class="brand">TODAY'S EARNINGS</span><span class="chip"></span></div>
+                    <div class="label">Ready for payout</div>
+                    <div class="amount num">&#8358;<span id="earnings">3,400</span></div>
+                    <div class="foot"><span id="trip-count">18 trips</span><span id="driver-id-tag">Driver #0114</span>
+                    </div>
+                </div>
+                <div class="decal-wrap">
+                    <div class="id-pill"><i class="ti ti-car"></i><span id="id-pill-text">Driver ID · 0114</span></div>
+                    <div class="decal">
+                        <div id="qr-target"></div>
+                    </div>
+                    <div class="waiting">Show this decal — passenger scans to pay</div>
+                    <div class="sim-row">
+                        <button class="btn btn-ghost" id="sim-200"><i class="ti ti-bolt"></i>Simulate
+                            &#8358;200</button>
+                        <button class="btn btn-ghost" id="sim-500"><i class="ti ti-bolt"></i>Simulate
+                            &#8358;500</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="screen" id="screen-driver-history">
+                <div class="section-title">Trip earnings</div>
+                <div id="driver-history"></div>
+            </div>
+
+            <div class="screen" id="screen-driver-settings">
+                <div class="profile-card">
+                    <div class="av"><i class="ti ti-steering-wheel"></i></div>
+                    <div>
+                        <div class="name" id="p-name-d">Musa Ibrahim</div>
+                        <div class="sub" id="p-sub-d">Keke Napep · #0114</div>
+                    </div>
+                </div>
+                <div class="section-title">Trusted banks</div>
+                <div id="bank-list"></div>
+                <div class="bank-row dashed" id="add-bank-row"><i class="ti ti-plus" style="margin-right:4px;"></i>Add
+                    another bank</div>
+                <p class="payout-note">Auto-sweeps nightly at 10:00 PM, zero fee. Cash out anytime in between.</p>
+                <button class="btn btn-gold btn-full" id="payout-btn" style="margin-bottom:18px;"><i
+                        class="ti ti-arrow-down-circle"></i>Cash out now</button>
+                <div class="section-title">Account</div>
+                <div class="action-item" id="switch-to-rider"><i class="ti ti-user"></i>Switch to passenger mode (demo)
+                </div>
+                <div class="action-item danger" id="logout-d"><i class="ti ti-logout"></i>Log out &amp; reset</div>
+            </div>
+
+            <div class="tabbar" id="tabbar-rider">
+                <button class="on" data-goto="rider-home"><i class="ti ti-home"></i>Home</button>
+                <button data-goto="rider-history"><i class="ti ti-receipt-2"></i>History</button>
+                <button data-goto="rider-settings"><i class="ti ti-settings"></i>Settings</button>
+            </div>
+            <div class="tabbar" id="tabbar-driver" style="display:none;">
+                <button class="on" data-goto="driver-home"><i class="ti ti-home"></i>Home</button>
+                <button data-goto="driver-history"><i class="ti ti-receipt-2"></i>History</button>
+                <button data-goto="driver-settings"><i class="ti ti-settings"></i>Settings</button>
+            </div>
+        </div>
+
+        <!-- FARE → METHOD SHEET -->
+        <div class="sheet-bg" id="modal-method">
+            <div class="sheet">
+                <div class="grabber"></div>
+                <h3>Pay driver</h3>
+                <p class="sub">Confirm the fare, then identify the driver.</p>
+                <input class="code-input amount-input" id="method-amount" inputmode="numeric" value="200">
+                <div class="method-row">
+                    <div class="method" id="method-scan"><i class="ti ti-qrcode"></i><span>Scan decal</span></div>
+                    <div class="method" id="method-code"><i class="ti ti-hash"></i><span>Enter code</span></div>
+                </div>
+                <button class="btn btn-ghost btn-full" style="margin-top:14px;" data-close>Cancel</button>
+            </div>
+        </div>
+
+        <div class="sheet-bg" id="modal-topup">
+            <div class="sheet">
+                <div class="grabber"></div>
+                <h3>Top up wallet</h3>
+                <p class="sub">Card, transfer or USSD via Paystack — funds land instantly.</p>
+                <div class="method-row" style="margin-bottom:14px;">
+                    <div class="method sel-method active" data-method="Card"><i
+                            class="ti ti-credit-card"></i><span>Card</span></div>
+                    <div class="method sel-method" data-method="Bank transfer"><i
+                            class="ti ti-building-bank"></i><span>Transfer</span></div>
+                    <div class="method sel-method" data-method="USSD"><i
+                            class="ti ti-device-mobile"></i><span>USSD</span></div>
+                </div>
+                <div class="fare-grid">
+                    <div class="fare-btn topup-amt sel" data-amt="500"><span class="num">&#8358;500</span></div>
+                    <div class="fare-btn topup-amt" data-amt="1000"><span class="num">&#8358;1,000</span></div>
+                    <div class="fare-btn topup-amt" data-amt="2000"><span class="num">&#8358;2,000</span></div>
+                </div>
+                <div class="modal-row" style="margin-top:16px;">
+                    <button class="btn btn-ghost" data-close>Cancel</button>
+                    <button class="btn btn-solid" id="confirm-topup">Fund wallet</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="sheet-bg" id="modal-scan">
+            <div class="sheet">
+                <div class="grabber"></div>
+                <h3>Scan driver decal</h3>
+                <p class="sub">Point your camera at the QR on the dashboard.</p>
+                <div class="qr-box"><i class="ti ti-viewfinder"></i>Camera preview</div>
+                <button class="btn btn-solid btn-full" id="confirm-scan">Simulate successful scan</button>
+                <button class="btn btn-ghost btn-full" style="margin-top:8px;" data-close>Cancel</button>
+            </div>
+        </div>
+
+        <div class="sheet-bg" id="modal-code">
+            <div class="sheet">
+                <div class="grabber"></div>
+                <h3>Enter driver code</h3>
+                <p class="sub">4-digit ID printed on the decal.</p>
+                <input class="code-input" id="driver-code-input" maxlength="4" inputmode="numeric" placeholder="0000">
+                <div class="modal-row">
+                    <button class="btn btn-ghost" data-close>Cancel</button>
+                    <button class="btn btn-solid" id="confirm-code">Continue</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="sheet-bg" id="modal-pay">
+            <div class="sheet">
+                <div class="grabber"></div>
+                <h3>Pay <span class="num" id="pay-amount">&#8358;200</span></h3>
+                <p class="sub">To driver <span id="pay-driver">#0114</span></p>
+                <div class="modal-row">
+                    <button class="btn btn-ghost" data-close>Cancel</button>
+                    <button class="btn btn-solid" id="confirm-pay"><i class="ti ti-scan-eye"></i>Confirm with Face
+                        ID</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CASH OUT SHEET -->
+        <div class="sheet-bg" id="modal-cashout">
+            <div class="sheet">
+                <div class="grabber"></div>
+                <h3>Cash out &#8358;<span id="cashout-amt">3,400</span></h3>
+                <p class="sub">To <span id="cashout-bank">OPay •••1123</span> — usually arrives in minutes.</p>
+                <div class="modal-row">
+                    <button class="btn btn-ghost" data-close>Cancel</button>
+                    <button class="btn btn-gold" id="confirm-cashout"><i class="ti ti-scan-eye"></i>Confirm with Face
+                        ID</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="flash" id="pay-flash">
+            <div class="ic"><i class="ti ti-check"></i></div>
+            <div class="amt num" id="pay-flash-amt">&#8358;200</div>
+            <div class="msg">Paid — safe trip</div>
+            <button class="btn" id="dismiss-pay-flash">Done</button>
+        </div>
+        <div class="flash gold" id="driver-flash">
+            <div class="ic"><i class="ti ti-check"></i></div>
+            <div class="amt num" id="driver-flash-amt">&#8358;200</div>
+            <div class="msg" id="driver-flash-msg">Received</div>
+            <button class="btn" id="dismiss-driver-flash">Done</button>
+        </div>
+
+        <div class="toast" id="toast"><i class="ti ti-circle-check-filled"></i><span id="toast-msg"></span></div>
+    </div>
+
+    <script>
+        /* ---------------------------------------------------------------
+         * KekePaysAPI — the shape a real backend integration would take.
+         * charge()/payFare() are SIMULATED: a live build posts to your own
+         * server, which holds the Paystack/Flutterwave secret key and calls
+         * their charge + verify endpoints. withdraw() maps to Paystack
+         * Transfers / Flutterwave Transfers on a real backend. A static
+         * file can never safely hold that key, so these are stubbed rather
+         * than faked as real.
+         * --------------------------------------------------------------- */
+        const KekePaysAPI = {
+            async charge({ amount, method }) { await new Promise(r => setTimeout(r, 500)); return { status: 'success', reference: 'KP-' + Date.now(), amount, method }; },
+            async payFare({ amount, driverId }) { await new Promise(r => setTimeout(r, 450)); return { status: 'success', reference: 'FARE-' + Date.now(), amount, driverId }; },
+            async withdraw({ amount, bank }) { await new Promise(r => setTimeout(r, 600)); return { status: 'success', reference: 'WD-' + Date.now(), amount, bank }; }
+        };
+
+        /* ---------- Biometric label: Face ID on iOS, fingerprint on Android ---------- */
+        const BIO = /Android/i.test(navigator.userAgent) ? { label: 'Fingerprint', icon: 'ti-fingerprint' } : { label: 'Face ID', icon: 'ti-scan-eye' };
+        document.querySelectorAll('.mark-ring i:not(.sweep)').forEach(i => { if (i.id !== 'qr-target') i.className = 'ti ' + BIO.icon; });
+        document.querySelectorAll('.biometric-icon').forEach(i => i.className = 'ti ' + BIO.icon + ' biometric-icon');
+        function refreshBiometricButtons() {
+            document.getElementById('confirm-pay').innerHTML = `<i class="ti ${BIO.icon}"></i>Confirm with ${BIO.label}`;
+            document.getElementById('confirm-cashout').innerHTML = `<i class="ti ${BIO.icon}"></i>Confirm with ${BIO.label}`;
+        }
+        refreshBiometricButtons();
+
+        function haptic(ms) { try { if (navigator.vibrate) navigator.vibrate(ms || 30); } catch (e) { } }
+        function chime(freqStart, freqEnd) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const o = ctx.createOscillator(), g = ctx.createGain();
+                o.type = 'sine'; o.frequency.value = freqStart || 900;
+                o.connect(g); g.connect(ctx.destination);
+                g.gain.setValueAtTime(0.13, ctx.currentTime);
+                o.start();
+                o.frequency.setValueAtTime(freqEnd || 1300, ctx.currentTime + 0.1);
+                g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.38);
+                o.stop(ctx.currentTime + 0.4);
+            } catch (e) { }
+        }
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2200);
+        }
+
+        /* ---------- Stage routing (onboarding / register / lock / shell) ---------- */
+        function showStage(id) {
+            ['onboarding', 'register-rider', 'register-driver', 'lock', 'shell'].forEach(s => {
+                document.getElementById(s).style.display = (s === id) ? 'flex' : 'none';
+            });
+        }
+        document.querySelectorAll('[data-back]').forEach(b => b.addEventListener('click', () => showStage(b.dataset.back)));
+        document.getElementById('pick-passenger').addEventListener('click', () => showStage('register-rider'));
+        document.getElementById('pick-driver').addEventListener('click', () => showStage('register-driver'));
+
+        let profile = null;
+        try { const p = localStorage.getItem('kekepays_profile'); if (p) profile = JSON.parse(p); } catch (e) { }
+        function saveProfile(p) { profile = p; try { localStorage.setItem('kekepays_profile', JSON.stringify(p)); } catch (e) { } }
+
+        document.getElementById('r-submit').addEventListener('click', () => {
+            const name = document.getElementById('r-name').value.trim();
+            const matric = document.getElementById('r-matric').value.trim();
+            const phone = document.getElementById('r-phone').value.trim();
+            const pin = document.getElementById('r-pin').value.trim();
+            if (!name || !matric || !phone || pin.length < 4) { document.getElementById('r-err').classList.add('show'); return; }
+            document.getElementById('r-err').classList.remove('show');
+            saveProfile({ role: 'rider', name, matric, phone, pin });
+            goToLock(true);
+        });
+        document.getElementById('d-submit').addEventListener('click', () => {
+            const name = document.getElementById('d-name').value.trim();
+            const phone = document.getElementById('d-phone').value.trim();
+            const vehicle = document.getElementById('d-vehicle').value;
+            const plate = document.getElementById('d-plate').value.trim();
+            const bank = document.getElementById('d-bank').value;
+            const acct = document.getElementById('d-acct').value.trim();
+            const pin = document.getElementById('d-pin').value.trim();
+            if (!name || !phone || !plate || !acct || pin.length < 4) { document.getElementById('d-err').classList.add('show'); return; }
+            document.getElementById('d-err').classList.remove('show');
+            const driverId = String(Math.floor(1000 + Math.random() * 9000));
+            saveProfile({ role: 'driver', name, phone, vehicle, plate, bank, acct, pin, driverId });
+            goToLock(true);
+        });
+
+        function goToLock(justRegistered) {
+            document.getElementById('lock-title').textContent = justRegistered ? 'You\'re all set' : 'KekePays';
+            document.getElementById('lock-sub').textContent = profile ? `${BIO.label} to continue, ${profile.name.split(' ')[0]}` : `${BIO.label} to open your wallet`;
+            showStage('lock');
+        }
+        document.getElementById('unlock-btn').addEventListener('click', () => {
+            const ring = document.getElementById('face-ring');
+            ring.classList.add('scanning'); haptic(20);
+            setTimeout(() => {
+                ring.classList.remove('scanning');
+                showStage('shell');
+                applyRole(profile.role);
+                haptic([20, 40, 20]);
+            }, 900);
+        });
+
+        /* ---------- Apply the logged-in role: only that dashboard is shown ---------- */
+        function renderBankList() {
+            const wrap = document.getElementById('bank-list'); wrap.innerHTML = '';
+            const row = document.createElement('div');
+            row.className = 'bank-row sel';
+            row.innerHTML = `<div class="bic"><i class="ti ti-building-bank"></i></div><div class="info"><div class="name">${profile.bank}</div><div class="sub">•••• ${profile.acct.slice(-4)} · Primary</div></div><div class="check"></div>`;
+            wrap.appendChild(row);
+        }
+        function applyRole(role) {
+            const isRider = role === 'rider';
+            document.getElementById('role-badge').textContent = isRider ? 'Passenger' : 'Driver';
+            document.getElementById('tabbar-rider').style.display = isRider ? 'flex' : 'none';
+            document.getElementById('tabbar-driver').style.display = isRider ? 'none' : 'flex';
+            if (isRider) {
+                document.getElementById('rider-name-tag').textContent = 'Matric ' + profile.matric;
+                document.getElementById('p-name-r').textContent = profile.name;
+                document.getElementById('p-sub-r').textContent = 'Matric ' + profile.matric + ' · UI Campus';
+            } else {
+                document.getElementById('id-pill-text').textContent = 'Driver ID · ' + profile.driverId;
+                document.getElementById('driver-id-tag').textContent = 'Driver #' + profile.driverId;
+                document.getElementById('qr-target').innerHTML = '';
+                new QRCode(document.getElementById('qr-target'), { text: 'kekepays://pay?driver=' + profile.driverId, width: 160, height: 160, colorDark: '#000000', colorLight: '#ffffff' });
+                document.getElementById('p-name-d').textContent = profile.name;
+                document.getElementById('p-sub-d').textContent = profile.vehicle + ' · #' + profile.driverId;
+                renderBankList();
+            }
+            goto(isRider ? 'rider-home' : 'driver-home');
+        }
+        if (profile) { goToLock(false); } else { showStage('onboarding'); }
+
+        /* ---------- Screen + tab routing ---------- */
+        function goto(id) {
+            document.querySelectorAll('.screen').forEach(s => { s.classList.remove('on'); s.style.display = 'none'; });
+            const target = document.getElementById('screen-' + id);
+            target.classList.add('on'); target.style.display = 'block';
+            document.querySelectorAll('.tabbar button').forEach(b => b.classList.toggle('on', b.dataset.goto === id));
+        }
+        document.querySelectorAll('.tabbar button').forEach(b => b.addEventListener('click', () => { haptic(15); goto(b.dataset.goto); }));
+        document.getElementById('goto-history').addEventListener('click', () => {
+            goto('rider-history');
+            document.querySelectorAll('#tabbar-rider button').forEach(b => b.classList.toggle('on', b.dataset.goto === 'rider-history'));
+        });
+
+        /* ---------- Settings actions ---------- */
+        function demoSwitch(targetRole) {
+            const hasProfile = targetRole === 'driver' ? document.getElementById('d-name').value : document.getElementById('r-name').value;
+            showStage(targetRole === 'driver' ? 'register-driver' : 'register-rider');
+        }
+        document.getElementById('switch-to-driver').addEventListener('click', () => demoSwitch('driver'));
+        document.getElementById('switch-to-rider').addEventListener('click', () => demoSwitch('rider'));
+        document.getElementById('logout-r').addEventListener('click', () => { try { localStorage.removeItem('kekepays_profile'); } catch (e) { } location.reload(); });
+        document.getElementById('logout-d').addEventListener('click', () => { try { localStorage.removeItem('kekepays_profile'); } catch (e) { } location.reload(); });
+        document.getElementById('add-bank-row').addEventListener('click', () => showToast('Linking additional banks is coming soon'));
+
+        /* ---------- Sheets ---------- */
+        function openSheet(id) { document.getElementById('modal-' + id).classList.add('on'); haptic(15); }
+        function closeSheets() { document.querySelectorAll('.sheet-bg').forEach(s => s.classList.remove('on')); }
+        document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', closeSheets));
+        document.querySelectorAll('.sheet-bg').forEach(bg => bg.addEventListener('click', e => { if (e.target === bg) closeSheets(); }));
+
+        /* ---------- Top-up ---------- */
+        let topupAmt = 500, topupMethod = 'Card';
+        document.querySelectorAll('.topup-amt').forEach(el => el.addEventListener('click', () => {
+            document.querySelectorAll('.topup-amt').forEach(x => x.classList.remove('sel'));
+            el.classList.add('sel'); topupAmt = parseInt(el.dataset.amt); haptic(10);
+        }));
+        document.querySelectorAll('.sel-method').forEach(el => el.addEventListener('click', () => {
+            document.querySelectorAll('.sel-method').forEach(x => x.classList.remove('active'));
+            el.classList.add('active'); topupMethod = el.dataset.method; haptic(10);
+        }));
+        document.getElementById('open-topup').addEventListener('click', () => openSheet('topup'));
+        document.getElementById('confirm-topup').addEventListener('click', async () => {
+            const btn = document.getElementById('confirm-topup'); btn.textContent = 'Processing…';
+            const res = await KekePaysAPI.charge({ amount: topupAmt, method: topupMethod });
+            btn.textContent = 'Fund wallet';
+            if (res.status === 'success') {
+                const balEl = document.getElementById('balance');
+                balEl.textContent = (parseInt(balEl.textContent.replace(/,/g, '')) + topupAmt).toLocaleString();
+                closeSheets(); haptic(30);
+                showToast(`₦${topupAmt.toLocaleString()} added via ${topupMethod}`);
+            }
+        });
+
+        /* ---------- Fare → method (scan/code) → confirm ---------- */
+        let currentFare = 200, currentDriver = '0114';
+        function openMethodSheet(amt) {
+            currentFare = amt;
+            document.getElementById('method-amount').value = amt;
+            openSheet('method');
+        }
+        document.querySelectorAll('.fare-grid .fare-btn[data-amt]').forEach(el => {
+            el.addEventListener('click', () => { haptic(10); openMethodSheet(parseInt(el.dataset.amt)); });
+        });
+        document.getElementById('fare-other').addEventListener('click', () => { haptic(10); openMethodSheet(200); });
+        document.getElementById('method-scan').addEventListener('click', () => {
+            currentFare = parseInt(document.getElementById('method-amount').value) || currentFare;
+            closeSheets(); openSheet('scan');
+        });
+        document.getElementById('method-code').addEventListener('click', () => {
+            currentFare = parseInt(document.getElementById('method-amount').value) || currentFare;
+            closeSheets(); openSheet('code');
+        });
+        document.getElementById('confirm-scan').addEventListener('click', () => {
+            currentDriver = '0114'; closeSheets();
+            document.getElementById('pay-amount').textContent = '₦' + currentFare;
+            document.getElementById('pay-driver').textContent = '#' + currentDriver;
+            haptic(20); openSheet('pay');
+        });
+        document.getElementById('confirm-code').addEventListener('click', () => {
+            const val = document.getElementById('driver-code-input').value;
+            if (val.length < 4) { showToast('Enter the full 4-digit code'); return; }
+            currentDriver = val; closeSheets();
+            document.getElementById('pay-amount').textContent = '₦' + currentFare;
+            document.getElementById('pay-driver').textContent = '#' + val;
+            openSheet('pay');
+        });
+        document.getElementById('confirm-pay').addEventListener('click', async () => {
+            const balEl = document.getElementById('balance');
+            const bal = parseInt(balEl.textContent.replace(/,/g, ''));
+            if (bal < currentFare) { closeSheets(); showToast('Insufficient balance — top up first'); return; }
+            const btn = document.getElementById('confirm-pay'); btn.textContent = 'Verifying…';
+            const res = await KekePaysAPI.payFare({ amount: currentFare, driverId: currentDriver });
+            refreshBiometricButtons();
+            if (res.status === 'success') {
+                balEl.textContent = (bal - currentFare).toLocaleString();
+                closeSheets();
+                prependTrip('history', { who: 'Driver #' + currentDriver, when: 'Just now', amt: currentFare, sign: '-' });
+                document.getElementById('pay-flash-amt').textContent = '₦' + currentFare;
+                document.getElementById('pay-flash').classList.add('show');
+                haptic([20, 50, 20]); chime(900, 1300);
+            }
+        });
+        document.getElementById('dismiss-pay-flash').addEventListener('click', () => document.getElementById('pay-flash').classList.remove('show'));
+
+        function prependTrip(listId, { who, when, amt, sign }) {
+            const wrap = document.getElementById(listId);
+            const row = document.createElement('div');
+            row.className = 'trip';
+            const posClass = sign === '+' ? ' pos' : '';
+            row.innerHTML = `<div class="trip-left"><div class="trip-ic"><i class="ti ti-steering-wheel"></i></div><div><div class="who">${who}</div><div class="when">${when}</div></div></div><div class="amt num${posClass}">${sign}₦${amt}</div>`;
+            wrap.prepend(row);
+        }
+        [{ who: 'Keke #4213', when: 'Today, 7:52 AM · Sub → CBN', amt: 200, sign: '-' },
+        { who: 'Keke #0871', when: 'Yesterday, 5:10 PM · Tech → Zik', amt: 100, sign: '-' },
+        { who: 'Cab #0022', when: 'Yesterday, 8:01 AM · Awo → Fac. of Arts', amt: 600, sign: '-' }].forEach(t => prependTrip('history', t));
+        [{ who: 'Passenger •••4213', when: 'Today, 7:52 AM', amt: 200, sign: '+' },
+        { who: 'Passenger •••0871', when: 'Today, 6:40 AM', amt: 100, sign: '+' },
+        { who: 'Passenger •••0022', when: 'Yesterday, 8:01 PM', amt: 600, sign: '+' }].forEach(t => prependTrip('driver-history', t));
+
+        /* ---------- Driver: simulated incoming payments ---------- */
+        function receivePayment(amt) {
+            document.getElementById('earnings').textContent = (parseInt(document.getElementById('earnings').textContent.replace(/,/g, '')) + amt).toLocaleString();
+            const tc = document.getElementById('trip-count');
+            tc.textContent = (parseInt(tc.textContent) + 1) + ' trips';
+            prependTrip('driver-history', { who: 'Passenger •••' + String(Math.floor(Math.random() * 9000) + 1000), when: 'Just now', amt, sign: '+' });
+            document.getElementById('driver-flash-msg').textContent = 'Received';
+            document.getElementById('dismiss-driver-flash').textContent = 'Back to waiting';
+            document.getElementById('driver-flash-amt').textContent = '₦' + amt;
+            document.getElementById('driver-flash').classList.add('show');
+            haptic([20, 60, 20]); chime(700, 1000);
+        }
+        document.getElementById('sim-200').addEventListener('click', () => receivePayment(200));
+        document.getElementById('sim-500').addEventListener('click', () => receivePayment(500));
+        document.getElementById('dismiss-driver-flash').addEventListener('click', () => document.getElementById('driver-flash').classList.remove('show'));
+
+        /* ---------- Cash out ---------- */
+        document.getElementById('payout-btn').addEventListener('click', () => {
+            const earnEl = document.getElementById('earnings');
+            if (earnEl.textContent === '0') { showToast('No earnings to cash out yet'); return; }
+            document.getElementById('cashout-amt').textContent = earnEl.textContent;
+            document.getElementById('cashout-bank').textContent = profile.bank + ' •••' + profile.acct.slice(-4);
+            openSheet('cashout');
+        });
+        document.getElementById('confirm-cashout').addEventListener('click', async () => {
+            const btn = document.getElementById('confirm-cashout'); btn.textContent = 'Processing…';
+            const earnEl = document.getElementById('earnings');
+            const amt = earnEl.textContent;
+            const res = await KekePaysAPI.withdraw({ amount: amt, bank: profile.bank });
+            refreshBiometricButtons();
+            if (res.status === 'success') {
+                closeSheets();
+                earnEl.textContent = '0';
+                document.getElementById('driver-flash-msg').textContent = 'Cashed out';
+                document.getElementById('dismiss-driver-flash').textContent = 'Done';
+                document.getElementById('driver-flash-amt').textContent = '₦' + amt;
+                document.getElementById('driver-flash').classList.add('show');
+                haptic([20, 60, 20]); chime(700, 1000);
+            }
+        });
+    </script>
+</body>
+
+</html>
