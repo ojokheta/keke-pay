@@ -979,9 +979,7 @@
 
         <!-- ONBOARDING -->
         <div class="stage stage-center" id="onboarding">
-            <div class="mark-ring" style="background:var(--surface); width:72px;height:72px;"><i
-                    class="ti ti-scooter"></i></div>
-            <h1>Welcome to KekePays</h1>
+            <img src="../assets/logo.png" alt="Kekepay" width="168" height="128" style="margin-bottom:16px;">
             <p class="sub">Campus transit, digitised. Choose how you'll use it.</p>
             <button class="btn btn-solid btn-full" id="pick-passenger" style="margin-bottom:10px;"><i
                     class="ti ti-user"></i>Continue as a passenger</button>
@@ -1044,10 +1042,8 @@
 
         <!-- LOCK -->
         <div class="stage stage-center" id="lock">
-            <div class="mark-ring" id="face-ring"><i class="ti ti-scan-eye"></i>
-                <div class="sweep"></div>
-            </div>
-            <h1 id="lock-title">KekePays</h1>
+            <img src="../assets/logo.png" alt="Kekepay" width="168" height="128" style="margin-bottom:16px;">
+            <h1 id="lock-title" style="display:none;">KekePays</h1>
             <p class="sub" id="lock-sub">Face ID to open your wallet</p>
             <button class="btn btn-ghost" id="unlock-btn" style="padding:16px 28px;"><i
                     class="ti ti-lock-open"></i>Unlock</button>
@@ -1055,7 +1051,7 @@
 
         <div id="shell">
             <div class="headrow">
-                <div class="brand"><i class="ti ti-scooter" style="font-size:20px;"></i><span>KekePays</span><span
+                <div class="brand"><img src="../assets/logo.png" alt="Kekepay" width="72" height="55"><span
                         class="role-badge" id="role-badge">Passenger</span></div>
             </div>
 
@@ -1360,15 +1356,17 @@
         });
 
         function goToLock(justRegistered) {
-            document.getElementById('lock-title').textContent = justRegistered ? 'You\'re all set' : 'KekePays';
+            const title = document.getElementById('lock-title');
+            title.textContent = justRegistered ? 'You\'re all set' : 'KekePays';
+            title.style.display = justRegistered ? 'block' : 'none';
             document.getElementById('lock-sub').textContent = profile ? `${BIO.label} to continue, ${profile.name.split(' ')[0]}` : `${BIO.label} to open your wallet`;
             showStage('lock');
         }
         document.getElementById('unlock-btn').addEventListener('click', () => {
             const ring = document.getElementById('face-ring');
-            ring.classList.add('scanning'); haptic(20);
+            if (ring) ring.classList.add('scanning'); haptic(20);
             setTimeout(() => {
-                ring.classList.remove('scanning');
+                if (ring) ring.classList.remove('scanning');
                 showStage('shell');
                 applyRole(profile.role);
                 haptic([20, 40, 20]);
